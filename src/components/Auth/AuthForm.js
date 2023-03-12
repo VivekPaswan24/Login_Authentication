@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { useState, useRef } from 'react';
+import { useState, useRef, useContext } from 'react';
+import AuthContext from '../store/auth-context';
 
 import classes from './AuthForm.module.css';
 
@@ -8,6 +9,7 @@ const AuthForm = () => {
   const [request,setRequest]=useState(false)
   const emailInputRef=useRef();
   const passwordInputRef=useRef();
+  const authctx=useContext(AuthContext);
 
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
@@ -18,7 +20,19 @@ const AuthForm = () => {
     const enteredEmail=emailInputRef.current.value
     const enteredPassword=passwordInputRef.current.value
     if(isLogin){
-
+      try{
+        setRequest(true)
+        let response=await axios.post('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyB1iK65FMYWFrjJYGx9PebXpYwZbDcaJ80',{
+          email:enteredEmail,
+          password:enteredPassword,
+          returnSecureToken:true
+        })
+        authctx.login(response.data.idToken)
+        setRequest(false)
+      }catch(error){
+        alert(error.response.data.error.message)
+        setRequest(false)
+      }
     }else{
       try{
         setRequest(true)
