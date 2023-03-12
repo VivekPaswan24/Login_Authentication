@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useState, useRef, useContext } from 'react';
+import { useHistory } from 'react-router-dom';
 import AuthContext from '../store/auth-context';
 
 import classes from './AuthForm.module.css';
@@ -7,9 +8,13 @@ import classes from './AuthForm.module.css';
 const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [request,setRequest]=useState(false)
+
   const emailInputRef=useRef();
   const passwordInputRef=useRef();
+
   const authctx=useContext(AuthContext);
+
+  const history=useHistory()
 
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
@@ -29,6 +34,7 @@ const AuthForm = () => {
         })
         authctx.login(response.data.idToken)
         setRequest(false)
+        history.replace('/profile')
       }catch(error){
         alert(error.response.data.error.message)
         setRequest(false)
